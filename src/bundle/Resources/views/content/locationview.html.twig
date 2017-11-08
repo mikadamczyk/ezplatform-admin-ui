@@ -42,7 +42,7 @@
             </div>
             <div class="panel panel-primary">
                 <div class="panel-body">
-                    {{ ez_platform_tabs('location-view', {'content': content, 'location': location,  'contentType': contentType }, 'EzPlatformAdminUiBundle:parts/tab:locationview.html.twig') }}
+                    {{ ez_platform_tabs('location-view', {'content': content, 'location': location,  'contentType': contentType, 'form_location_update': form_location_update }, 'EzPlatformAdminUiBundle:parts/tab:locationview.html.twig') }}
 
                     {% if contentType.isContainer %}
                     <div class="container">

@@ -15,6 +15,7 @@ use EzSystems\EzPlatformAdminUi\Form\Data\Content\Draft\ContentDraftCreateData;
 use EzSystems\EzPlatformAdminUi\Form\Data\Location\LocationCopyData;
 use EzSystems\EzPlatformAdminUi\Form\Data\Location\LocationMoveData;
 use EzSystems\EzPlatformAdminUi\Form\Data\Location\LocationTrashData;
+use EzSystems\EzPlatformAdminUi\Form\Data\Location\LocationUpdateData;
 use EzSystems\EzPlatformAdminUi\Form\Factory\FormFactory;
 use EzSystems\EzPlatformAdminUi\UI\Service\PathService;
 
@@ -92,15 +93,23 @@ class ContentViewController extends Controller
         $locationCopyType = $this->formFactory->copyLocation(
             new LocationCopyData($location)
         );
+
         $locationMoveType = $this->formFactory->moveLocation(
             new LocationMoveData($location)
         );
+
         $locationTrashType = $this->formFactory->trashLocation(
             new LocationTrashData($location)
         );
+
+        $locationUpdateType = $this->formFactory->updateLocation(
+            new LocationUpdateData($location)
+        );
+
         $contentDraftCreateType = $this->formFactory->createContentDraft(
             new ContentDraftCreateData($content->contentInfo, $versionInfo)
         );
+
         $contentCreateType = $this->formFactory->createContent(
             $this->getContentCreateData($location)
         );
@@ -109,6 +118,7 @@ class ContentViewController extends Controller
             'form_location_copy' => $locationCopyType->createView(),
             'form_location_move' => $locationMoveType->createView(),
             'form_location_trash' => $locationTrashType->createView(),
+            'form_location_update' => $locationUpdateType->createView(),
             'form_content_draft_create' => $contentDraftCreateType->createView(),
             'form_content_create' => $contentCreateType->createView(),
         ]);
