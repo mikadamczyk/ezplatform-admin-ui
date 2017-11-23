@@ -1,0 +1,12 @@
+services:
+    ez_template:
+        class: EzSystems\EzPlatformAdminUiBundle\View\Template\EzTemplate
+        arguments:
+            - "@translator"
+
+    EzSystems\EzPlatformAdminUiBundle\View\EzView:
+        public: false
+        arguments:
+            - "@ez_template"
+        tags:
+            - { name: 'pagerfanta.view', alias: 'ez' }

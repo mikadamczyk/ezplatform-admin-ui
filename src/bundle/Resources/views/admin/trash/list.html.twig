@@ -66,6 +66,16 @@
                     </tbody>
                 </table>
                 {{ form_end(form_trash_item_restore) }}
+
+                <div class="row justify-content-center align-items-center">
+                    <h6>{{ 'trash.viewing'|trans({'%viewing%': pager.currentPageResults|length, '%total%': pager.nbResults})|desc('Viewing %viewing% out of %total% items') }}</h6>
+                </div>
+                <div class="row justify-content-center align-items-center">
+                    {% if pager.haveToPaginate %}
+                        {{ pagerfanta(pager, 'ez') }}
+                    {% endif %}
+                </div>
+
                 {% include 'EzPlatformAdminUiBundle:admin/trash:empty_trash_confirmation_modal.html.twig' with {'form': form_trash_empty, 'trash_items_count': trash_items|length} %}
             </section>
         </div>

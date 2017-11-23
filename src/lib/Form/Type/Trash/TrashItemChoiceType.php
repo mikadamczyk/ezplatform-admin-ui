@@ -47,8 +47,10 @@ class TrashItemChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+//        var_dump($this->getTrashItemDataChoices());
+//        die();
         $resolver->setDefaults([
-            'choices' => $this->getTrashItemDataChoices(),
+//            'choices' => $this->getTrashItemDataChoices(),
             'choice_attr' => function (TrashItemData $val) {
                 return [
                     'data-is-parent-in-trash' => (int)$val->isParentInTrash(),
@@ -65,20 +67,20 @@ class TrashItemChoiceType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getTrashItemDataChoices(): array
-    {
-        $trashItems = $this->trashService->findTrashItems(new Query([
-            'sortClauses' => [new Query\SortClause\Location\Priority(Query::SORT_ASC)],
-        ]))->items;
-
-        return array_map(function (TrashItem $item) {
-            $contentType = $this->contentTypeService->loadContentType($item->contentInfo->contentTypeId);
-            $ancestors = $this->pathService->loadPathLocations($item);
-
-            return new TrashItemData($item, $contentType, $ancestors);
-        }, $trashItems);
-    }
+//    /**
+//     * @return array
+//     */
+//    private function getTrashItemDataChoices(): array
+//    {
+//        $trashItems = $this->trashService->findTrashItems(new Query([
+//            'sortClauses' => [new Query\SortClause\Location\Priority(Query::SORT_ASC)],
+//        ]))->items;
+//
+//        return array_map(function (TrashItem $item) {
+//            $contentType = $this->contentTypeService->loadContentType($item->contentInfo->contentTypeId);
+//            $ancestors = $this->pathService->loadPathLocations($item);
+//
+//            return new TrashItemData($item, $contentType, $ancestors);
+//        }, $trashItems);
+//    }
 }

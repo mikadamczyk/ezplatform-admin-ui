@@ -381,7 +381,7 @@ class FormFactory
     ): FormInterface {
         $name = $name ?: StringUtil::fqcnToBlockPrefix(TrashItemRestoreType::class);
 
-        return $this->formFactory->createNamed($name, TrashItemRestoreType::class, $data);
+        return $this->formFactory->createNamed($name, TrashItemRestoreType::class, $data, ['trashItems'=> $data->getTrashItems()]);
     }
 
     /**
