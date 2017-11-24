@@ -74,7 +74,7 @@ use EzSystems\EzPlatformAdminUi\Form\Type\Section\SectionCreateType;
 use EzSystems\EzPlatformAdminUi\Form\Type\Section\SectionDeleteType;
 use EzSystems\EzPlatformAdminUi\Form\Type\Section\SectionUpdateType;
 use EzSystems\EzPlatformAdminUi\Form\Type\Trash\TrashEmptyType;
-use EzSystems\EzPlatformAdminUi\Form\Type\Trash\TrashItemRestoreType;
+use EzSystems\EzPlatformAdminUi\Form\Type\Trash\TrashRestoreType;
 use EzSystems\EzPlatformAdminUi\Form\Type\Version\VersionRemoveType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -379,9 +379,9 @@ class FormFactory
         TrashItemRestoreData $data = null,
         ?string $name = null
     ): FormInterface {
-        $name = $name ?: StringUtil::fqcnToBlockPrefix(TrashItemRestoreType::class);
+        $name = $name ?: StringUtil::fqcnToBlockPrefix(TrashRestoreType::class);
 
-        return $this->formFactory->createNamed($name, TrashItemRestoreType::class, $data, ['trashItems'=> $data->getTrashItems()]);
+        return $this->formFactory->createNamed($name, TrashRestoreType::class, $data);
     }
 
     /**

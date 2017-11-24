@@ -20,7 +20,7 @@ class TrashItemRestoreData
     /**
      * @Assert\NotBlank()
      *
-     * @var TrashItemData[]
+     * @var Location[]
      */
     public $trashItems;
 
@@ -28,17 +28,18 @@ class TrashItemRestoreData
     public $location;
 
     /**
-     * @param TrashItemData[] $trashItems
+     * @param Location[] $trashItems
      * @param Location|null $location
      */
     public function __construct(array $trashItems = [], ?Location $location = null)
     {
+        dump($trashItems);
         $this->trashItems = $trashItems;
         $this->location = $location;
     }
 
     /**
-     * @return TrashItemData[]
+     * @return Location[]
      */
     public function getTrashItems(): array
     {
@@ -46,7 +47,7 @@ class TrashItemRestoreData
     }
 
     /**
-     * @param TrashItemData[] $trashItems
+     * @param Location[] $trashItems
      */
     public function setTrashItems(array $trashItems)
     {

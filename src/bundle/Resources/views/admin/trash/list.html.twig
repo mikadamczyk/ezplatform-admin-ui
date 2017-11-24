@@ -4,6 +4,12 @@
 
 {% block pageTitle %}{% endblock %}
 
+{% form_theme form_trash_item_restore _self %}
+
+{% block location_checkbox_widget %}
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+{% endblock %}
+
 {% block content %}
     <div class="row align-items-stretch ez-main-row">
 
@@ -23,7 +29,7 @@
                             {{ form_widget(form_trash_item_restore.location.select_content, restore_under_new_parent_button_attr) }}
                             {{ form_widget(form_trash_item_restore.location.location) }}
                             {% do form_trash_item_restore.location.setRendered %}
-                            {{ form_widget(form_trash_item_restore.restore, {'attr': {'class': 'btn btn-primary', 'disabled': true}}) }}
+                            {{ form_widget(form_trash_item_restore.restore, {'attr': {'class': 'btn btn-primary', 'disabled': false}}) }}
                         {% else %}
                             {% do form_trash_item_restore.location.setRendered %}
                             {% do form_trash_item_restore.restore.setRendered %}
@@ -50,7 +56,7 @@
                         {% for key, form in form_trash_item_restore.trash_items %}
                             {% set trash_item = trash_items[key] %}
                             <tr>
-                                <td>{{ form_row(form) }}</td>
+                                <td>{{ form_widget(form) }}</td>
                                 <td>{{ ez_content_name(trash_item.location.contentInfo) }}</td>
                                 <td>{{ trash_item.contentType.name }}</td>
                                 <td>
@@ -72,7 +78,7 @@
                 </div>
                 <div class="row justify-content-center align-items-center">
                     {% if pager.haveToPaginate %}
-                        {{ pagerfanta(pager, 'ez') }}
+                    {#{{ pagerfanta(pager, 'ez') }}#}
                     {% endif %}
                 </div>
 

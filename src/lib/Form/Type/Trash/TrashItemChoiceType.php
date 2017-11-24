@@ -7,13 +7,15 @@
 namespace EzSystems\EzPlatformAdminUi\Form\Type\Trash;
 
 use eZ\Publish\API\Repository\ContentTypeService;
+use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\TrashService;
-use eZ\Publish\API\Repository\Values\Content\Query;
-use eZ\Publish\API\Repository\Values\Content\TrashItem;
 use EzSystems\EzPlatformAdminUi\Form\Data\TrashItemData;
 use EzSystems\EzPlatformAdminUi\UI\Service\PathService;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TrashItemChoiceType extends AbstractType
@@ -28,6 +30,11 @@ class TrashItemChoiceType extends AbstractType
     private $contentTypeService;
 
     /**
+     * @var LocationService
+     */
+    private $locationService;
+
+    /**
      * @param TrashService $trashService
      * @param PathService $pathService
      * @param ContentTypeService $contentTypeService
@@ -35,11 +42,44 @@ class TrashItemChoiceType extends AbstractType
     public function __construct(
         TrashService $trashService,
         PathService $pathService,
-        ContentTypeService $contentTypeService
+        ContentTypeService $contentTypeService,
+        LocationService $locationService
     ) {
         $this->trashService = $trashService;
         $this->pathService = $pathService;
         $this->contentTypeService = $contentTypeService;
+        $this->locationService = $locationService;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->addModelTransformer(new CallbackTransformer(
+            function($value) {
+                if (null === $value) {
+                    return null;
+                }
+
+                if (!($value instanceof TrashItemData)) {
+                    throw new TransformationFailedException('Expected a ' . TrashItemData::class . ' object.');
+                }
+
+                if ($value->getLocation() !== null) {
+                    return $value->getLocation()->id;
+                }
+
+                return null;
+            },
+            function($value) {
+                if (empty($value)) {
+                    return null;
+                }
+
+                return null;
+            }
+        ));
     }
 
     /**
@@ -47,16 +87,15 @@ class TrashItemChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-//        var_dump($this->getTrashItemDataChoices());
-//        die();
-        $resolver->setDefaults([
+
+//        $resolver->setDefaults([
 //            'choices' => $this->getTrashItemDataChoices(),
-            'choice_attr' => function (TrashItemData $val) {
-                return [
-                    'data-is-parent-in-trash' => (int)$val->isParentInTrash(),
-                ];
-            },
-        ]);
+//            'choice_attr' => function (TrashItemData $val) {
+//                return [
+//                    'data-is-parent-in-trash' => (int)$val->isParentInTrash(),
+//                ];
+//            },
+//        ]);
     }
 
     /**
@@ -64,23 +103,6 @@ class TrashItemChoiceType extends AbstractType
      */
     public function getParent(): ?string
     {
-        return ChoiceType::class;
+        return TextType::class;
     }
-
-//    /**
-//     * @return array
-//     */
-//    private function getTrashItemDataChoices(): array
-//    {
-//        $trashItems = $this->trashService->findTrashItems(new Query([
-//            'sortClauses' => [new Query\SortClause\Location\Priority(Query::SORT_ASC)],
-//        ]))->items;
-//
-//        return array_map(function (TrashItem $item) {
-//            $contentType = $this->contentTypeService->loadContentType($item->contentInfo->contentTypeId);
-//            $ancestors = $this->pathService->loadPathLocations($item);
-//
-//            return new TrashItemData($item, $contentType, $ancestors);
-//        }, $trashItems);
-//    }
 }

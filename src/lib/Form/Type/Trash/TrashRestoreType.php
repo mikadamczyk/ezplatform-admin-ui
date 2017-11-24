@@ -12,13 +12,17 @@ use EzSystems\EzPlatformAdminUi\Form\Data\TrashItemData;
 use EzSystems\EzPlatformAdminUi\Form\Type\UniversalDiscoveryWidget\UniversalDiscoveryWidgetType;
 use EzSystems\EzPlatformAdminUi\UI\Service\PathService;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TrashItemRestoreType extends AbstractType
+class TrashRestoreType extends AbstractType
 {
     /**
      * @var ContentTypeService
@@ -47,27 +51,34 @@ class TrashItemRestoreType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-//        $options['data']['trash_items'] = $options['trashItems'];
-//        var_dump($options['trashItems']);
-//        die();
+        $builder->add('trash_items', CollectionType::class, [
+            'entry_type' => LocationCheckboxType::class,
+            'entry_options' => [
+                'required' => false
+            ],
+            'allow_add' => true,
+            'allow_delete' => true
+        ]);
+
+
         $builder
-            ->add(
-                'trash_items',
-                TrashItemChoiceType::class,
-                [
-                    'multiple' => true,
-                    'expanded' => true,
-                    'choice_label' => false,
-                    'label' => false,
-                    'choices' => $options['trashItems'],
-                    'choice_attr' => function (TrashItemData $val) {
-                        return [
-                            'data-is-parent-in-trash' => (int)$val->isParentInTrash(),
-                        ];
-                    },
-                    'data' => null
-                ]
-            )
+//            ->add(
+//                'trash_items',
+//                TrashItemChoiceType::class,
+//                [
+//                    'multiple' => true,
+//                    'expanded' => true,
+//                    'choice_label' => false,
+//                    'label' => false,
+//                    'choices' => $options['trashItems'],
+//                    'choice_attr' => function (TrashItemData $val) {
+//                        return [
+//                            'data-is-parent-in-trash' => (int)$val->isParentInTrash(),
+//                        ];
+//                    },
+//                    'data' => null
+//                ]
+//            )
             ->add(
                 'location',
                 UniversalDiscoveryWidgetType::class,
@@ -114,8 +125,7 @@ class TrashItemRestoreType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => TrashItemRestoreData::class,
-            'translation_domain' => 'forms',
-            'trashItems' => [],
+            'translation_domain' => 'forms'
         ]);
     }
 }
