@@ -1,0 +1,57 @@
+{% use 'bootstrap_4_layout.html.twig' %}
+
+{% trans_default_domain 'change_user_password' %}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        {%- for error in errors -%}
+            <em class="ez-field-edit__error">{{ error.message }}</em>
+        {%- endfor -%}
+    {%- endif -%}
+{%- endblock -%}
+
+{% block form_row -%}
+    {{ block('form_row_field') }}
+{%- endblock %}
+
+{% block form_row_field %}
+    {% set widget_wrapper_attr = widget_wrapper_attr|default({})|merge({'class': (widget_wrapper_attr.class|default('') ~ ' ez-field-edit__data')|trim}) %}
+    {% set wrapper_class = 'ez-field-edit' %}
+    {% if required %}{% set wrapper_class = (wrapper_class|default('') ~ ' ez-field-edit--required')|trim %}{% endif %}
+    {% if errors|length > 0 %}{% set wrapper_class = (wrapper_class|default('') ~ ' is-invalid')|trim %}{% endif %}
+
+    {% set label_wrapper_attr = label_wrapper_attr|default({})|merge({'class': (label_wrapper_attr.class|default('') ~ 'ez-field-edit__label-wrapper')|trim}) %}
+    {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' ez-field-edit__label')|trim}) %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ez-data-source__input')|trim}) %}
+    {% set wrapper_attr = wrapper_attr|default({})|merge({'class': (wrapper_attr.class|default('') ~ ' ' ~ wrapper_class)|trim}) %}
+
+    <div{% with { attr: wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+        <div{% with { attr: label_wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+            {{ block('form_label') }}
+            {{ block('form_errors') }}
+        </div>
+
+        {% if widget_container_block is defined %}
+            {{ widget_container_block|raw }}
+        {% else %}
+            <div{% with { attr: widget_wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+                <div class="ez-data-source">
+                    {{- form_widget(form, {'attr': attr}) -}}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{%- block form_widget_compound -%}
+    {%- if form.parent is empty -%}
+        {{ form_errors(form) }}
+    {%- endif -%}
+    {{- block('form_rows') -}}
+    {{- form_rest(form) -}}
+{%- endblock form_widget_compound -%}
+
+{%- block number_widget -%}
+    {%- set type = type|default('number') -%}
+    {{ block('form_widget_simple') }}
+{%- endblock number_widget -%}
