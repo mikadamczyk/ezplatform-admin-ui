@@ -7,6 +7,8 @@
 namespace EzSystems\EzPlatformAdminUi\Form\Type\Search;
 
 use EzSystems\EzPlatformAdminUi\Form\Data\Search\SearchData;
+use EzSystems\EzPlatformAdminUi\Form\Type\ContentType\ContentTypeChoiceType;
+use EzSystems\EzPlatformAdminUi\Form\Type\Section\SectionChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SearchType as CoreSearchType;
 use Symfony\Component\Form\AbstractType;
@@ -25,6 +27,16 @@ class SearchType extends AbstractType
             ->add('query', CoreSearchType::class)
             ->add('page', HiddenType::class)
             ->add('limit', HiddenType::class)
+            ->add('section', SectionChoiceType::class, [
+                'required' => false,
+                'multiple' => false,
+            ])
+            ->add('content_types', ContentTypeChoiceType::class, [
+                'multiple' => true,
+                'expanded' => true,
+            ])
+            ->add('last_modified', DateIntervalType::class)
+            ->add('created', DateIntervalType::class)
         ;
     }
 

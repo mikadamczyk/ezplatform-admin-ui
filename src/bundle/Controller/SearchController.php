@@ -11,6 +11,8 @@ use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use eZ\Publish\API\Repository\Values\Content\Query\SortClause;
 use eZ\Publish\Core\Pagination\Pagerfanta\ContentSearchAdapter;
 use eZ\Publish\API\Repository\SearchService;
+use eZ\Publish\API\Repository\SectionService;
+use eZ\Publish\API\Repository\ContentTypeService;
 use EzSystems\EzPlatformAdminUi\Form\Data\Content\Draft\ContentEditData;
 use EzSystems\EzPlatformAdminUi\Form\Data\Search\SearchData;
 use EzSystems\EzPlatformAdminUi\Form\Factory\FormFactory;
@@ -38,6 +40,12 @@ class SearchController extends Controller
     /** @var SubmitHandler */
     private $submitHandler;
 
+    /** @var SectionService */
+    private $sectionService;
+
+    /** @var ContentTypeService */
+    private $contentTypeService;
+
     /** @var int */
     private $defaultPaginationLimit;
 
@@ -47,6 +55,8 @@ class SearchController extends Controller
      * @param UrlGeneratorInterface $urlGenerator
      * @param FormFactory $formFactory
      * @param SubmitHandler $submitHandler
+     * @param SectionService $sectionService
+     * @param ContentTypeService $contentTypeService
      * @param int $defaultPaginationLimit
      */
     public function __construct(
@@ -55,6 +65,8 @@ class SearchController extends Controller
         UrlGeneratorInterface $urlGenerator,
         FormFactory $formFactory,
         SubmitHandler $submitHandler,
+        SectionService $sectionService,
+        ContentTypeService $contentTypeService,
         int $defaultPaginationLimit
     ) {
         $this->searchService = $searchService;
@@ -62,6 +74,8 @@ class SearchController extends Controller
         $this->urlGenerator = $urlGenerator;
         $this->formFactory = $formFactory;
         $this->submitHandler = $submitHandler;
+        $this->sectionService = $sectionService;
+        $this->contentTypeService = $contentTypeService;
         $this->defaultPaginationLimit = $defaultPaginationLimit;
     }
 
@@ -80,9 +94,22 @@ class SearchController extends Controller
         $limit = $search['limit'] ?? $this->defaultPaginationLimit;
         $page = $search['page'] ?? 1;
         $query = $search['query'];
+        $section = null;
+        $contentTypes = [];
+        $lastModified = [];
+        $created = [];
+
+        if (!empty($search['section'])) {
+            $section = $this->sectionService->loadSection($search['section']);
+        }
+        if (!empty($search['content_types']) && is_array($search['content_types'])) {
+            foreach ($search['content_types'] as $identifier) {
+                $contentTypes[] = $this->contentTypeService->loadContentTypeByIdentifier($identifier);
+            }
+        }
 
         $form = $this->formFactory->createSearchForm(
-            new SearchData($limit, $page, $query),
+            new SearchData($limit, $page, $query, $section, $contentTypes, $lastModified, $created),
             'search',
             [
                 'method' => Request::METHOD_GET,
@@ -92,14 +119,46 @@ class SearchController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $result = $this->submitHandler->handle($form, function (SearchData $data) use ($form) {
                 $limit = $data->getLimit();
                 $page = $data->getPage();
                 $queryString = $data->getQuery();
-
+                $section = $data->getSection();
+                $contentTypes = $data->getContentTypes();
+                $lastModified = $data->getLastModified();
+                $created = $data->getCreated();
+                //dump((new \DateTime())->setTimestamp($lastModified['start_date'])->format('Y-m-d'));
+                //dump((new \DateTime())->setTimestamp($lastModified['end_date'])->format('Y-m-d'));
                 $query = new Query();
-                $query->filter = new Criterion\FullText($queryString);
+                $criteria = [
+                    new Criterion\FullText($queryString),
+                ];
+
+                if (null !== $section) {
+                    $criteria[] = new Criterion\SectionId($section->id);
+                }
+
+                if (!empty($contentTypes)) {
+                    $criteria[] = new Criterion\ContentTypeId(array_column($contentTypes, 'id'));
+                }
+                if (!empty($lastModified)) {
+                    $criteria[] = new Criterion\DateMetadata(
+                        Criterion\DateMetadata::MODIFIED,
+                        Criterion\Operator::BETWEEN,
+                        [$lastModified['start_date'], $lastModified['end_date']]
+                    );
+                }
+
+                if (!empty($created)) {
+                    $criteria[] = new Criterion\DateMetadata(
+                        Criterion\DateMetadata::CREATED,
+                        Criterion\Operator::BETWEEN,
+                        [$created['start_date'], $created['end_date']]
+                    );
+                }
+
+                $query->filter = new Criterion\LogicalAnd($criteria);
                 $query->sortClauses[] = new SortClause\DateModified(Query::SORT_ASC);
 
                 $pagerfanta = new Pagerfanta(
