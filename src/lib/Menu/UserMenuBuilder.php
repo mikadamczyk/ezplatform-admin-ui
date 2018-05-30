@@ -24,7 +24,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class UserMenuBuilder extends AbstractBuilder implements TranslationContainerInterface
 {
     const ITEM_LOGOUT = 'user__content';
-    const ITEM_CHANGE_PASSWORD = 'user__change_password';
     const ITEM_BOOKMARK = 'user__bookmark';
 
     /** @var TokenStorageInterface */
@@ -64,9 +63,6 @@ class UserMenuBuilder extends AbstractBuilder implements TranslationContainerInt
         $token = $this->tokenStorage->getToken();
         if (null !== $token && is_object($token->getUser())) {
             $menu->addChild(
-                $this->createMenuItem(self::ITEM_CHANGE_PASSWORD, ['route' => 'ezplatform.user_profile.change_password'])
-            );
-            $menu->addChild(
                 $this->createMenuItem(self::ITEM_BOOKMARK, ['route' => 'ezplatform.bookmark.list'])
             );
             $menu->addChild(
@@ -84,7 +80,6 @@ class UserMenuBuilder extends AbstractBuilder implements TranslationContainerInt
     {
         return [
             (new Message(self::ITEM_LOGOUT, 'menu'))->setDesc('Logout'),
-            (new Message(self::ITEM_CHANGE_PASSWORD, 'menu'))->setDesc('Change password'),
             (new Message(self::ITEM_BOOKMARK, 'menu'))->setDesc('Bookmarks'),
         ];
     }
