@@ -8,38 +8,8 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Form\Data\User;
 
-use Symfony\Component\Validator\Constraints as Assert;
+use EzSystems\EzPlatformUser\Form\Data\User\UserPasswordResetData as UserBundleUserPasswordResetData;
 
-class UserPasswordResetData
+class UserPasswordResetData extends UserBundleUserPasswordResetData
 {
-    /**
-     * @Assert\NotBlank()
-     *
-     * @var string
-     */
-    private $newPassword;
-
-    /**
-     * @param string|null $newPassword
-     */
-    public function __construct(?string $newPassword = null)
-    {
-        $this->newPassword = $newPassword;
-    }
-
-    /**
-     * @param string|null $newPassword
-     */
-    public function setNewPassword(?string $newPassword): void
-    {
-        $this->newPassword = $newPassword;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNewPassword(): ?string
-    {
-        return $this->newPassword;
-    }
 }

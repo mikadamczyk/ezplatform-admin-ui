@@ -8,38 +8,8 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Form\Data\User;
 
-use Symfony\Component\Validator\Constraints as Assert;
+use EzSystems\EzPlatformUser\Form\Data\User\UserPasswordForgotWithLoginData as UserBundleUserPasswordForgotWithLoginData;
 
-class UserPasswordForgotWithLoginData
+class UserPasswordForgotWithLoginData extends UserBundleUserPasswordForgotWithLoginData
 {
-    /**
-     * @Assert\NotBlank()
-     *
-     * @var string
-     */
-    private $login;
-
-    /**
-     * @param string|null $login
-     */
-    public function __construct(?string $login = null)
-    {
-        $this->login = $login;
-    }
-
-    /**
-     * @param string|null $login
-     */
-    public function setLogin(?string $login): void
-    {
-        $this->login = $login;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getLogin(): ?string
-    {
-        return $this->login;
-    }
 }

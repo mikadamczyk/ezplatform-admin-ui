@@ -8,103 +8,27 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUiBundle\Controller\UserProfile;
 
-use eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException;
-use eZ\Publish\API\Repository\Exceptions\ContentValidationException;
-use eZ\Publish\API\Repository\UserService;
-use eZ\Publish\API\Repository\LanguageService;
-use EzSystems\EzPlatformAdminUi\Form\Factory\FormFactory;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
-use EzSystems\EzPlatformAdminUiBundle\Controller\Controller;
+use EzSystems\EzPlatformUserBundle\Controller\PasswordChangeController;
+use eZ\Publish\API\Repository\Values\Content\Location;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Exception;
 
-class UserPasswordChangeController extends Controller
+class UserPasswordChangeController extends PasswordChangeController
 {
-    /** @var NotificationHandlerInterface */
-    private $notificationHandler;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var LanguageService */
-    private $userService;
-
-    /** @var FormFactory */
-    private $formFactory;
-
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /**
-     * @param NotificationHandlerInterface $notificationHandler
-     * @param TranslatorInterface $translator
-     * @param UserService $userService
-     * @param FormFactory $formFactory
-     * @param TokenStorageInterface $tokenStorage
-     */
-    public function __construct(
-        NotificationHandlerInterface $notificationHandler,
-        TranslatorInterface $translator,
-        UserService $userService,
-        FormFactory $formFactory,
-        TokenStorageInterface $tokenStorage
-    ) {
-        $this->notificationHandler = $notificationHandler;
-        $this->translator = $translator;
-        $this->userService = $userService;
-        $this->formFactory = $formFactory;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct()
+    {
     }
 
     /**
-     * @param Request $request
+     * @param \eZ\Publish\API\Repository\Values\Content\Location $location
+     * @param string $uriFragment
      *
-     * @return Response
-     *
-     * @throws InvalidArgumentException
-     * @throws ContentValidationException
-     * @throws ContentFieldValidationException
-     * @throws InvalidOptionsException
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function userPasswordChangeAction(Request $request): Response
+    public function redirectToLocation(Location $location, string $uriFragment = ''): RedirectResponse
     {
-        $form = $this->formFactory->changeUserPassword();
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            try {
-                $newPassword = $data->getNewPassword();
-                $userUpdateStruct = $this->userService->newUserUpdateStruct();
-                $userUpdateStruct->password = $newPassword;
-                $user = $this->tokenStorage->getToken()->getUser()->getAPIUser();
-
-                $this->userService->updateUser($user, $userUpdateStruct);
-
-                $this->notificationHandler->success(
-                    $this->translator->trans(
-                        /** @Desc("Your password has been successfully changed.") */
-                        'user.change_password.success',
-                        [],
-                        'user_change_password'
-                    )
-                );
-
-                return new RedirectResponse($this->generateUrl('ezplatform.dashboard'));
-            } catch (Exception $e) {
-                $this->notificationHandler->error($e->getMessage());
-            }
-        }
-
-        return $this->render('@EzPlatformAdminUi/user-profile/change_user_password.html.twig', [
-            'form_change_user_password' => $form->createView(),
+        return $this->redirectToRoute('_ezpublishLocation', [
+            'locationId' => $location->id,
+            '_fragment' => $uriFragment,
         ]);
     }
 }

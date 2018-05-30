@@ -11,8 +11,6 @@ namespace EzSystems\EzPlatformAdminUi\Menu;
 use eZ\Publish\API\Repository\Exceptions as ApiExceptions;
 use EzSystems\EzPlatformAdminUi\Menu\Event\ConfigureMenuEvent;
 use InvalidArgumentException;
-use JMS\TranslationBundle\Model\Message;
-use JMS\TranslationBundle\Translation\TranslationContainerInterface;
 use Knp\Menu\ItemInterface;
 
 /**
@@ -20,12 +18,8 @@ use Knp\Menu\ItemInterface;
  *
  * @see https://symfony.com/doc/current/bundles/KnpMenuBundle/menu_builder_service.html
  */
-class UserPasswordChangeRightSidebarBuilder extends AbstractBuilder implements TranslationContainerInterface
+class UserPasswordChangeRightSidebarBuilder extends AbstractBuilder
 {
-    /* Menu items */
-    const ITEM__UPDATE = 'user_password_change__sidebar_right__update';
-    const ITEM__CANCEL = 'user_password_change__sidebar_right__cancel';
-
     /**
      * @return string
      */
@@ -48,37 +42,6 @@ class UserPasswordChangeRightSidebarBuilder extends AbstractBuilder implements T
         /** @var ItemInterface $menu */
         $menu = $this->factory->createItem('root');
 
-        $menu->setChildren([
-            self::ITEM__UPDATE => $this->createMenuItem(
-                self::ITEM__UPDATE,
-                [
-                    'attributes' => [
-                        'class' => 'btn--trigger',
-                        'data-click' => '#user_password_change_change',
-                    ],
-                    'extras' => ['icon' => 'publish'],
-                ]
-            ),
-            self::ITEM__CANCEL => $this->createMenuItem(
-                self::ITEM__CANCEL,
-                [
-                    'route' => 'ezplatform.dashboard',
-                    'extras' => ['icon' => 'circle-close'],
-                ]
-            ),
-        ]);
-
         return $menu;
-    }
-
-    /**
-     * @return Message[]
-     */
-    public static function getTranslationMessages(): array
-    {
-        return [
-            (new Message(self::ITEM__UPDATE, 'menu'))->setDesc('Update'),
-            (new Message(self::ITEM__CANCEL, 'menu'))->setDesc('Discard changes'),
-        ];
     }
 }

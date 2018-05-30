@@ -37,3 +37,8 @@ services:
     # Symfony
     Symfony\Component\Translation\TranslatorInterface: '@translator'
 
+    # eZ User
+    EzSystems\EzPlatformAdminUiBundle\Controller\User\UserForgotPasswordController: '@EzSystems\EzPlatformUserBundle\Controller\PasswordResetController'
+    EzSystems\EzPlatformAdminUiBundle\Controller\UserProfile\UserPasswordChangeController: '@EzSystems\EzPlatformUserBundle\Controller\PasswordChangeController'
+
+
