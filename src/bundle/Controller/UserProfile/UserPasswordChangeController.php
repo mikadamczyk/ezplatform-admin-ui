@@ -12,6 +12,9 @@ use EzSystems\EzPlatformUserBundle\Controller\PasswordChangeController;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * @deprecated Deprecated in 1.2 and will be removed in 2.0. Please use EzSystems\EzPlatformUserBundle\Controller\PasswordChangeController
+ */
 class UserPasswordChangeController extends PasswordChangeController
 {
     public function __construct()

@@ -12,6 +12,9 @@ use EzSystems\EzPlatformUserBundle\Controller\PasswordResetController;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * @deprecated Deprecated in 1.2 and will be removed in 2.0. Please use EzSystems\EzPlatformUserBundle\Controller\PasswordResetController
+ */
 class UserForgotPasswordController extends PasswordResetController
 {
     public function __construct()
