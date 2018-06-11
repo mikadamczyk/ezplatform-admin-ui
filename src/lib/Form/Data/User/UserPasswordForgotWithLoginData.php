@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Form\Data\User;
 
-use EzSystems\EzPlatformUser\Form\Data\User\UserPasswordForgotWithLoginData as UserBundleUserPasswordForgotWithLoginData;
+use EzSystems\EzPlatformUser\Form\Data\UserPasswordForgotWithLoginData as UserBundleUserPasswordForgotWithLoginData;
 
 class UserPasswordForgotWithLoginData extends UserBundleUserPasswordForgotWithLoginData
 {

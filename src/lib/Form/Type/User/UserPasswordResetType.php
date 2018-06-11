@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Form\Type\User;
 
-use EzSystems\EzPlatformUser\Form\Type\User\UserPasswordResetType as UserBundleUserPasswordResetType;
+use EzSystems\EzPlatformUser\Form\Type\UserPasswordResetType as UserBundleUserPasswordResetType;
 
 class UserPasswordResetType extends UserBundleUserPasswordResetType
 {

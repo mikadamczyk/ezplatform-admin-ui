@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Form\Data\User;
 
-use EzSystems\EzPlatformUser\Form\Data\User\UserPasswordResetData as UserBundleUserPasswordResetData;
+use EzSystems\EzPlatformUser\Form\Data\UserPasswordResetData as UserBundleUserPasswordResetData;
 
 class UserPasswordResetData extends UserBundleUserPasswordResetData
 {

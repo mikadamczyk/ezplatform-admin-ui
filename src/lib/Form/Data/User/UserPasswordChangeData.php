@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Form\Data\User;
 
-use EzSystems\EzPlatformUser\Form\Data\User\UserPasswordChangeData as UserBundleUserPasswordChangeData;
+use EzSystems\EzPlatformUser\Form\Data\UserPasswordChangeData as UserBundleUserPasswordChangeData;
 
 class UserPasswordChangeData extends UserBundleUserPasswordChangeData
 {

@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Form\Type\User;
 
-use EzSystems\EzPlatformUser\Form\Type\User\UserPasswordForgotType as UserBundleUserPasswordForgotType;
+use EzSystems\EzPlatformUser\Form\Type\UserPasswordForgotType as UserBundleUserPasswordForgotType;
 
 class UserPasswordForgotType extends UserBundleUserPasswordForgotType
 {

@@ -941,6 +941,8 @@ class FormFactory
     }
 
     /**
+     * @deprecated Deprecated in 1.1 and will be removed in 2.0. Please use \EzSystems\EzPlatformUser\Form\Factory\FormFactory::changeUserPassword instead.
+     *
      * @param UserPasswordChangeData $data
      * @param null|string $name
      *
@@ -958,6 +960,8 @@ class FormFactory
     }
 
     /**
+     * @deprecated Deprecated in 1.1 and will be removed in 2.0. Please use \EzSystems\EzPlatformUser\Form\Factory\FormFactory::forgotUserPassword instead.
+     *
      * @param \EzSystems\EzPlatformAdminUi\Form\Data\User\UserPasswordForgotData $data
      * @param null|string $name
      *
@@ -975,6 +979,8 @@ class FormFactory
     }
 
     /**
+     * @deprecated Deprecated in 1.1 and will be removed in 2.0. Please use \EzSystems\EzPlatformUser\Form\Factory\FormFactory::forgotUserPasswordWithLogin instead.
+     *
      * @param \EzSystems\EzPlatformAdminUi\Form\Data\User\UserPasswordForgotWithLoginData $data
      * @param null|string $name
      *
@@ -992,6 +998,8 @@ class FormFactory
     }
 
     /**
+     * @deprecated Deprecated in 1.1 and will be removed in 2.0. Please use \EzSystems\EzPlatformUser\Form\Factory\FormFactory::resetUserPassword instead.
+     *
      * @param \EzSystems\EzPlatformAdminUi\Form\Data\User\UserPasswordResetData $data
      * @param null|string $name
      *
