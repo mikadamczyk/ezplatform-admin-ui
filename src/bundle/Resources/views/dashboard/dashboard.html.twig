@@ -10,9 +10,12 @@
         <div class="container-fluid ez-header">
             <div class="col-sm-12">
                 <div class="container ez-dashboard__header">
-                    <h1 class="py-3">My dashboard</h1>
+                    <h1 class="py-3">{{ 'my.dashboard'|trans|desc('My dashboard') }}</h1>
                     <div class="ez-dashboard__create">
-                        <button class="btn btn-primary ez-btn--cotf-create" data-udw-config="{{ ez_udw_config('create', {}) }}">
+                        <button
+                            class="btn btn-primary ez-btn--cotf-create"
+                            data-udw-config="{{ ez_udw_config('create', {'type': 'content_create'}) }}"
+                            {% if not can_create_content %}disabled{% endif %}>
                             <svg class="ez-icon ez-icon--medium ez-icon--light ez-icon-create">
                                 <use xlink:href="{{ asset('bundles/ezplatformadminui/img/ez-icons.svg') }}#create"></use>
                             </svg>

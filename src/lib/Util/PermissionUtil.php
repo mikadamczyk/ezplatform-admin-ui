@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace EzSystems\EzPlatformAdminUi\Util;
 
+use eZ\Publish\API\Repository\Values\User\Limitation\ContentTypeLimitation;
+
 class PermissionUtil
 {
     /**
@@ -37,5 +39,23 @@ class PermissionUtil
         }
 
         return $limitations;
+    }
+
+    /**
+     * @param array $hasAccess
+     *
+     * @return array
+     */
+    public function getRestrictedContentTypesIds(array $hasAccess): array
+    {
+        $restrictedContentTypesIds = [];
+
+        foreach ($this->flattenArrayOfLimitations($hasAccess) as $limitation) {
+            if ($limitation instanceof ContentTypeLimitation) {
+                $restrictedContentTypesIds[] = $limitation->limitationValues;
+            }
+        }
+
+        return empty($restrictedContentTypesIds) ? $restrictedContentTypesIds : array_unique(array_merge(...$restrictedContentTypesIds));
     }
 }
