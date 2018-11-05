@@ -10,25 +10,34 @@ namespace EzSystems\EzPlatformAdminUi\Form\Type\Content\Draft;
 
 use eZ\Publish\API\Repository\LanguageService;
 use EzSystems\EzPlatformAdminUi\Form\Data\Content\Draft\ContentCreateData;
+use EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Loader\CreateContentContentTypeChoiceLoader;
 use EzSystems\EzPlatformAdminUi\Form\Type\Content\LocationType;
 use EzSystems\EzPlatformAdminUi\Form\Type\ContentType\ContentTypeChoiceType;
 use EzSystems\EzPlatformAdminUi\Form\Type\Language\LanguageChoiceType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContentCreateType extends AbstractType
 {
-    /** @var LanguageService */
+    /** @var \eZ\Publish\API\Repository\LanguageService */
     protected $languageService;
 
+    /** @var \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Loader\CreateContentContentTypeChoiceLoader */
+    private $createContentContentTypeChoiceLoader;
+
     /**
-     * @param LanguageService $languageService
+     * @param \eZ\Publish\API\Repository\LanguageService $languageService
+     * @param \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Loader\CreateContentContentTypeChoiceLoader $createContentContentTypeChoiceLoader
      */
-    public function __construct(LanguageService $languageService)
-    {
+    public function __construct(
+        LanguageService $languageService,
+        CreateContentContentTypeChoiceLoader $createContentContentTypeChoiceLoader
+    ) {
         $this->languageService = $languageService;
+        $this->createContentContentTypeChoiceLoader = $createContentContentTypeChoiceLoader;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -41,6 +50,7 @@ class ContentCreateType extends AbstractType
                     'label' => false,
                     'multiple' => false,
                     'expanded' => true,
+                    'choice_loader' => new CallbackChoiceLoader([$this->createContentContentTypeChoiceLoader, 'load']),
                 ]
             )
             ->add(
