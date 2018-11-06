@@ -92,6 +92,10 @@ services:
         arguments:
             $policyMap: "%ezpublish.api.role.policy_map%"
 
+    EzSystems\EzPlatformAdminUi\Form\Type\Content\Draft\ContentCreateType:
+        arguments:
+            $choiceListProvider: '@EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\PermisionAwareChoiceListProvider'
+
     EzSystems\EzPlatformAdminUi\UI\Dataset\DatasetFactory:
         arguments:
             $userContentTypeIdentifier: '$user_content_type_identifier$'
@@ -151,3 +155,13 @@ services:
             - {name: kernel.event_subscriber, priority: -250}
 
     EzSystems\EzPlatformAdminUiBundle\Templating\Twig\UserPreferencesGlobalExtension: ~
+
+    EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ContentTypeChoiceListProvider: ~
+
+    EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\PermisionAwareChoiceListProvider:
+        arguments:
+            $decorated: '@EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ContentTypeChoiceListProvider'
+            $module: 'content'
+            $function: 'create'
+
+
