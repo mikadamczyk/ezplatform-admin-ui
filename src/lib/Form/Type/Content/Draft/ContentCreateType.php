@@ -28,16 +28,22 @@ class ContentCreateType extends AbstractType
     /** @var \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ChoiceListProviderInterface */
     private $choiceListProvider;
 
+    /** @var \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ChoiceListProviderInterface */
+    private $languageChoiceListProvider;
+
     /**
      * @param \eZ\Publish\API\Repository\LanguageService $languageService
      * @param \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ChoiceListProviderInterface $choiceListProvider
+     * @param \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ChoiceListProviderInterface $languageChoiceListProvider
      */
     public function __construct(
         LanguageService $languageService,
-        ChoiceListProviderInterface $choiceListProvider
+        ChoiceListProviderInterface $choiceListProvider,
+        ChoiceListProviderInterface $languageChoiceListProvider
     ) {
         $this->languageService = $languageService;
         $this->choiceListProvider = $choiceListProvider;
+        $this->languageChoiceListProvider = $languageChoiceListProvider;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -65,6 +71,7 @@ class ContentCreateType extends AbstractType
                     'label' => false,
                     'multiple' => false,
                     'expanded' => false,
+                    'choice_loader' => new CallbackChoiceLoader([$this->languageChoiceListProvider, 'getChoiceList']),
                 ]
             )
             ->add(

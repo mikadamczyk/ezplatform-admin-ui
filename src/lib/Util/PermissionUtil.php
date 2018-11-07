@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace EzSystems\EzPlatformAdminUi\Util;
 
 use eZ\Publish\API\Repository\Values\User\Limitation\ContentTypeLimitation;
+use eZ\Publish\API\Repository\Values\User\Limitation\LanguageLimitation;
 
 class PermissionUtil
 {
@@ -57,5 +58,23 @@ class PermissionUtil
         }
 
         return empty($restrictedContentTypesIds) ? $restrictedContentTypesIds : array_unique(array_merge(...$restrictedContentTypesIds));
+    }
+
+    /**
+     * @param $hasAccess
+     *
+     * @return array
+     */
+    public function getRestrictedLanguagesCodes($hasAccess): array
+    {
+        $restrictedLanguagesCodes = [];
+
+        foreach ($this->flattenArrayOfLimitations($hasAccess) as $limitation) {
+            if ($limitation instanceof LanguageLimitation) {
+                $restrictedLanguagesCodes[] = $limitation->limitationValues;
+            }
+        }
+
+        return empty($restrictedLanguagesCodes) ? $restrictedLanguagesCodes : array_unique(array_merge(...$restrictedLanguagesCodes));
     }
 }

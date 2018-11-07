@@ -10,8 +10,9 @@ namespace EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider;
 
 use eZ\Publish\API\Repository\PermissionResolver;
 use EzSystems\EzPlatformAdminUi\Util\PermissionUtil;
+use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 
-class PermisionAwareChoiceListProvider implements ChoiceListProviderInterface
+class PermissionAwareContentTypeChoiceListProvider implements ChoiceListProviderInterface
 {
     /** @var \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ChoiceListProviderInterface */
     private $decorated;
@@ -22,22 +23,26 @@ class PermisionAwareChoiceListProvider implements ChoiceListProviderInterface
     /** @var \EzSystems\EzPlatformAdminUi\Util\PermissionUtil */
     private $permissionUtil;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $module;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     private $function;
 
     /**
-     * @param \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ChoiceListProviderInterface $decorated
      * @param \eZ\Publish\API\Repository\PermissionResolver $permissionResolver
      * @param \EzSystems\EzPlatformAdminUi\Util\PermissionUtil $permissionUtil
+     * @param \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\ContentTypeChoiceListProvider $decorated
+     * @param string $module
+     * @param string $function
      */
-    public function __construct(PermissionResolver $permissionResolver, PermissionUtil $permissionUtil, ContentTypeChoiceListProvider $decorated, string $module, string $function)
-    {
+    public function __construct(
+        PermissionResolver $permissionResolver,
+        PermissionUtil $permissionUtil,
+        ContentTypeChoiceListProvider $decorated,
+        string $module,
+        string $function
+    ) {
         $this->decorated = $decorated;
         $this->permissionResolver = $permissionResolver;
         $this->permissionUtil = $permissionUtil;
@@ -45,6 +50,11 @@ class PermisionAwareChoiceListProvider implements ChoiceListProviderInterface
         $this->function = $function;
     }
 
+    /**
+     * @return array
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
+     */
     public function getChoiceList(): array
     {
         $hasAccess = $this->permissionResolver->hasAccess($this->module, $this->function);
@@ -59,7 +69,7 @@ class PermisionAwareChoiceListProvider implements ChoiceListProviderInterface
         }
 
         foreach($contentTypesGroups as $group => $contentTypes) {
-            $contentTypesGroups[$group] = array_filter($contentTypesGroups, function ($contentType) use ($restrictedContentTypesIds) {
+            $contentTypesGroups[$group] = array_filter($contentTypes, function (ContentType $contentType) use ($restrictedContentTypesIds) {
                 return in_array($contentType->id, $restrictedContentTypesIds);
             });
         }

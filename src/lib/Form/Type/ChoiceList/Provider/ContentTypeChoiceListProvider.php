@@ -23,6 +23,9 @@ class ContentTypeChoiceListProvider implements ChoiceListProviderInterface
         $this->contentTypeService = $contentTypeService;
     }
 
+    /**
+     * @return array
+     */
     public function getChoiceList(): array
     {
         $contentTypes = [];
