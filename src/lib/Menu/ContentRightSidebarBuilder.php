@@ -20,6 +20,7 @@ use EzSystems\EzPlatformAdminUi\Menu\Event\ConfigureMenuEvent;
 use EzSystems\EzPlatformAdminUi\Specification\Content\ContentHaveAssetRelation;
 use EzSystems\EzPlatformAdminUi\Specification\ContentIsUser;
 use EzSystems\EzPlatformAdminUi\Specification\Location\IsRoot;
+use EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface;
 use EzSystems\EzPlatformAdminUiBundle\Templating\Twig\UniversalDiscoveryExtension;
 use EzSystems\EzPlatformAdminUi\Specification\Location\IsWithinCopySubtreeLimit;
 use JMS\TranslationBundle\Model\Message;
@@ -65,6 +66,9 @@ class ContentRightSidebarBuilder extends AbstractBuilder implements TranslationC
     /** @var \eZ\Publish\API\Repository\ContentService */
     private $contentService;
 
+    /** @var \EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface */
+    private $permissionUtil;
+
     /**
      * @param \EzSystems\EzPlatformAdminUi\Menu\MenuItemFactory $factory
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
@@ -75,6 +79,7 @@ class ContentRightSidebarBuilder extends AbstractBuilder implements TranslationC
      * @param \eZ\Publish\API\Repository\SearchService $searchService
      * @param \EzSystems\EzPlatformAdminUiBundle\Templating\Twig\UniversalDiscoveryExtension $udwExtension
      * @param \eZ\Publish\API\Repository\ContentService $contentService
+     * @param \EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface $permissionUtil
      */
     public function __construct(
         MenuItemFactory $factory,
@@ -85,7 +90,8 @@ class ContentRightSidebarBuilder extends AbstractBuilder implements TranslationC
         ContentTypeService $contentTypeService,
         SearchService $searchService,
         UniversalDiscoveryExtension $udwExtension,
-        ContentService $contentService
+        ContentService $contentService,
+        PermissionUtilInterface $permissionUtil
     ) {
         parent::__construct($factory, $eventDispatcher);
 
@@ -96,6 +102,7 @@ class ContentRightSidebarBuilder extends AbstractBuilder implements TranslationC
         $this->searchService = $searchService;
         $this->udwExtension = $udwExtension;
         $this->contentService = $contentService;
+        $this->permissionUtil = $permissionUtil;
     }
 
     /**
@@ -124,8 +131,11 @@ class ContentRightSidebarBuilder extends AbstractBuilder implements TranslationC
         $content = $options['content'];
         /** @var ItemInterface|ItemInterface[] $menu */
         $menu = $this->factory->createItem('root');
-        $canCreate = $this->permissionResolver->hasAccess('content', 'create')
-            && $contentType->isContainer;
+
+        $hasAccess = $this->permissionResolver->hasAccess('content', 'create');
+        $canCreateInLocation = $this->permissionUtil->canCreateInLocation($location, $hasAccess);
+
+        $canCreate = $canCreateInLocation && $contentType->isContainer;
         $canEdit = $this->permissionResolver->canUser(
             'content',
             'edit',

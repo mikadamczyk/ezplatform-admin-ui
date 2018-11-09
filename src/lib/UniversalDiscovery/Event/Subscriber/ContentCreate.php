@@ -13,7 +13,7 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\PermissionResolver;
 use eZ\Publish\API\Repository\Values\User\Limitation\ContentTypeLimitation;
 use EzSystems\EzPlatformAdminUi\UniversalDiscovery\Event\ConfigResolveEvent;
-use EzSystems\EzPlatformAdminUi\Util\PermissionUtil;
+use EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContentCreate implements EventSubscriberInterface
@@ -21,7 +21,7 @@ class ContentCreate implements EventSubscriberInterface
     /** @var array */
     private $restrictedContentTypesIdentifiers;
 
-    /** @var \EzSystems\EzPlatformAdminUi\Util\PermissionUtil */
+    /** @var \EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface */
     private $permissionUtil;
 
     /** @var \eZ\Publish\API\Repository\ContentTypeService */
@@ -29,14 +29,14 @@ class ContentCreate implements EventSubscriberInterface
 
     /**
      * @param \eZ\Publish\API\Repository\PermissionResolver $permissionResolver
-     * @param \EzSystems\EzPlatformAdminUi\Util\PermissionUtil $permissionUtil
+     * @param \EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface $permissionUtil
      * @param \eZ\Publish\API\Repository\ContentTypeService $contentTypeService
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
      */
     public function __construct(
         PermissionResolver $permissionResolver,
-        PermissionUtil $permissionUtil,
+        PermissionUtilInterface $permissionUtil,
         ContentTypeService $contentTypeService
     ) {
         $this->contentTypeService = $contentTypeService;
@@ -92,7 +92,7 @@ class ContentCreate implements EventSubscriberInterface
             return [];
         }
 
-        $restrictedContentTypesIds = $this->permissionUtil->getRestrictedContentTypesIds($hasAccess);
+        $restrictedContentTypesIds = $this->permissionUtil->getRestrictions($hasAccess, ContentTypeLimitation::class);
 
         if (empty($restrictedContentTypesIds)) {
             return [];

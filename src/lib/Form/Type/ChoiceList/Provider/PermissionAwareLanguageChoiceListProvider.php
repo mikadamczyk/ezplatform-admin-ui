@@ -9,7 +9,8 @@ declare(strict_types=1);
 namespace EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider;
 
 use eZ\Publish\API\Repository\PermissionResolver;
-use EzSystems\EzPlatformAdminUi\Util\PermissionUtil;
+use eZ\Publish\API\Repository\Values\User\Limitation\LanguageLimitation;
+use EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface;
 use eZ\Publish\API\Repository\Values\Content\Language;
 
 class PermissionAwareLanguageChoiceListProvider implements ChoiceListProviderInterface
@@ -20,7 +21,7 @@ class PermissionAwareLanguageChoiceListProvider implements ChoiceListProviderInt
     /** @var \eZ\Publish\API\Repository\PermissionResolver */
     private $permissionResolver;
 
-    /** @var \EzSystems\EzPlatformAdminUi\Util\PermissionUtil */
+    /** @var \EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface */
     private $permissionUtil;
 
     /** @var string */
@@ -31,14 +32,14 @@ class PermissionAwareLanguageChoiceListProvider implements ChoiceListProviderInt
 
     /**
      * @param \eZ\Publish\API\Repository\PermissionResolver $permissionResolver
-     * @param \EzSystems\EzPlatformAdminUi\Util\PermissionUtil $permissionUtil
+     * @param \EzSystems\EzPlatformAdminUi\Util\PermissionUtilInterface $permissionUtil
      * @param \EzSystems\EzPlatformAdminUi\Form\Type\ChoiceList\Provider\LanguageChoiceListProvider $decorated
      * @param string $module
      * @param string $function
      */
     public function __construct(
         PermissionResolver $permissionResolver,
-        PermissionUtil $permissionUtil,
+        PermissionUtilInterface $permissionUtil,
         LanguageChoiceListProvider $decorated,
         string $module,
         string $function
@@ -60,7 +61,7 @@ class PermissionAwareLanguageChoiceListProvider implements ChoiceListProviderInt
         $restrictedLanguagesCodes = [];
         $hasAccess = $this->permissionResolver->hasAccess($this->module, $this->function);
         if (!is_bool($hasAccess)) {
-            $restrictedLanguagesCodes = $this->permissionUtil->getRestrictedLanguagesCodes($hasAccess);
+            $restrictedLanguagesCodes = $this->permissionUtil->getRestrictions($hasAccess, LanguageLimitation::class);
         }
 
         $languages = $this->decorated->getChoiceList();
@@ -76,6 +77,5 @@ class PermissionAwareLanguageChoiceListProvider implements ChoiceListProviderInt
         return array_filter($languages, function (Language $language) use ($restrictedLanguagesCodes) {
             return in_array($language->languageCode, $restrictedLanguagesCodes, true);
         });
-
     }
 }
