@@ -28,6 +28,7 @@ use EzSystems\EzPlatformAdminUi\Specification\UserExists;
 use EzSystems\EzPlatformAdminUi\UI\Dataset\DatasetFactory;
 use EzSystems\EzPlatformAdminUi\UI\Service\PathService;
 use EzSystems\EzPlatformAdminUi\UI\Value as UIValue;
+use EzSystems\RepositoryForms\Data\Content\ContentUpdateData;
 
 class ValueFactory
 {
@@ -166,6 +167,10 @@ class ValueFactory
      */
     public function createLocation(Location $location): UIValue\Content\Location
     {
+        $contentUpdateStruct = new ContentUpdateData([
+            'initialLanguageCode' => $location->contentInfo->mainLanguageCode,
+        ]);
+
         return new UIValue\Content\Location($location, [
             'childCount' => $this->locationService->getLocationChildCount($location),
             'pathLocations' => $this->pathService->loadPathLocations($location),
@@ -176,7 +181,7 @@ class ValueFactory
                 'content', 'remove', $location->getContentInfo(), [$location]
             ),
             'userCanEdit' => $this->permissionResolver->canUser(
-                'content', 'edit', $location->getContentInfo(), [$location]
+                'content', 'edit', $location->getContentInfo(), [$location, $contentUpdateStruct]
             ),
             'main' => $location->getContentInfo()->mainLocationId === $location->id,
         ]);
@@ -252,7 +257,9 @@ class ValueFactory
                 'pathLocations' => $this->pathService->loadPathLocations(
                     $this->locationService->loadLocation($location->contentInfo->mainLocationId)
                 ),
-                'userCanEdit' => $this->permissionResolver->canUser('content', 'edit', $location->contentInfo),
+                'userCanEdit' => $this->permissionResolver->canUser('content', 'edit', $location->contentInfo, [new ContentUpdateData([
+                    'initialLanguageCode' => $versionInfo->initialLanguageCode,
+                ])]),
             ]
         );
     }

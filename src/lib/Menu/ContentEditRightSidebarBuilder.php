@@ -13,6 +13,7 @@ use eZ\Publish\API\Repository\Values\Content\Language;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use EzSystems\EzPlatformAdminUi\Menu\Event\ConfigureMenuEvent;
 use EzSystems\EzPlatformAdminUi\Siteaccess\NonAdminSiteaccessResolver;
+use EzSystems\RepositoryForms\Data\Content\ContentUpdateData;
 use InvalidArgumentException;
 use JMS\TranslationBundle\Model\Message;
 use JMS\TranslationBundle\Translation\TranslationContainerInterface;
@@ -97,8 +98,12 @@ class ContentEditRightSidebarBuilder extends AbstractBuilder implements Translat
         /** @var Location $parentLocation */
         $parentLocation = $options['parent_location'];
 
+        $contentUpdateStruct = new ContentUpdateData([
+            'initialLanguageCode' => $language->languageCode,
+        ]);
+
         $canPublish = $this->permissionResolver->canUser('content', 'publish', $content);
-        $canEdit = $this->permissionResolver->canUser('content', 'edit', $content);
+        $canEdit = $this->permissionResolver->canUser('content', 'edit', $content, [$contentUpdateStruct]);
         $canDelete = $this->permissionResolver->canUser('content', 'versionremove', $content);
 
         $publishAttributes = [

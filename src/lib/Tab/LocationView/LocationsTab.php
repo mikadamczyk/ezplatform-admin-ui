@@ -18,6 +18,7 @@ use EzSystems\EzPlatformAdminUi\Form\Factory\FormFactory;
 use EzSystems\EzPlatformAdminUi\Tab\AbstractTab;
 use EzSystems\EzPlatformAdminUi\Tab\OrderedTabInterface;
 use EzSystems\EzPlatformAdminUi\UI\Dataset\DatasetFactory;
+use EzSystems\RepositoryForms\Data\Content\ContentUpdateData;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -128,9 +129,12 @@ class LocationsTab extends AbstractTab implements OrderedTabInterface
         $canCreate = $this->permissionResolver->canUser(
             'content', 'create', $location->getContentInfo()
         );
-        $canEdit = $this->permissionResolver->canUser(
-            'content', 'edit', $location->getContentInfo()
+        $canSwap = $this->permissionResolver->canUser(
+            'content', 'edit', $location->getContentInfo(), [new ContentUpdateData([
+                'initialLanguageCode' => $versionInfo->initialLanguageCode,
+            ])]
         );
+        dump($canSwap);
         $canHide = [];
         foreach ($locations as $location) {
             $canHide[$location->id] = $this->permissionResolver->canUser(
@@ -145,7 +149,7 @@ class LocationsTab extends AbstractTab implements OrderedTabInterface
             'form_content_location_swap' => $formLocationSwap->createView(),
             'form_content_location_update_visibility' => $formLocationUpdateVisibility->createView(),
             'form_content_location_main_update' => $formLocationMainUpdate->createView(),
-            'can_swap' => $canEdit,
+            'can_swap' => $canSwap,
             'can_add' => $canManageLocations && $canCreate,
             'can_hide' => $canHide,
         ];

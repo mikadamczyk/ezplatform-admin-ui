@@ -24,6 +24,7 @@ use EzSystems\EzPlatformAdminUi\Specification\Location\HasChildren;
 use EzSystems\EzPlatformAdminUi\Specification\Location\IsRoot;
 use EzSystems\EzPlatformAdminUiBundle\Templating\Twig\UniversalDiscoveryExtension;
 use EzSystems\EzPlatformAdminUi\Specification\Location\IsWithinCopySubtreeLimit;
+use EzSystems\RepositoryForms\Data\Content\ContentUpdateData;
 use JMS\TranslationBundle\Model\Message;
 use JMS\TranslationBundle\Translation\TranslationContainerInterface;
 use Knp\Menu\ItemInterface;
@@ -134,10 +135,16 @@ class ContentRightSidebarBuilder extends AbstractBuilder implements TranslationC
         $menu = $this->factory->createItem('root');
         $canCreate = $this->permissionResolver->hasAccess('content', 'create')
             && $contentType->isContainer;
+
+        $contentUpdateStruct = new ContentUpdateData([
+            'initialLanguageCode' => $content->versionInfo->initialLanguageCode,
+        ]);
+
         $canEdit = $this->permissionResolver->canUser(
             'content',
             'edit',
-            $location->getContentInfo()
+            $location->getContentInfo(),
+            [$contentUpdateStruct]
         );
         $canDelete = $this->permissionResolver->canUser(
             'content',
