@@ -97,8 +97,15 @@ class ContentEditRightSidebarBuilder extends AbstractBuilder implements Translat
         /** @var Location $parentLocation */
         $parentLocation = $options['parent_location'];
 
-        $canPublish = $this->permissionResolver->canUser('content', 'publish', $content);
         $canEdit = $this->permissionResolver->canUser('content', 'edit', $content);
+        $canTranslate = $this->permissionResolver->canUser('content', 'translate', $content);
+
+        if ($options['is_translate_view']) {
+            $canPublish = $this->permissionResolver->canUser('content', 'publish', $content) && $canTranslate;
+        } else {
+            $canPublish = $this->permissionResolver->canUser('content', 'publish', $content) && $canEdit;
+        }
+
         $canDelete = $this->permissionResolver->canUser('content', 'versionremove', $content);
 
         $publishAttributes = [
@@ -118,7 +125,7 @@ class ContentEditRightSidebarBuilder extends AbstractBuilder implements Translat
             self::ITEM__PUBLISH => $this->createMenuItem(
                 self::ITEM__PUBLISH,
                 [
-                    'attributes' => $canEdit && $canPublish
+                    'attributes' => $canPublish
                         ? $publishAttributes
                         : array_merge($publishAttributes, self::BTN_DISABLED_ATTR),
                     'extras' => ['icon' => 'publish'],

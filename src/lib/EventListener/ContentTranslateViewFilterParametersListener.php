@@ -66,6 +66,7 @@ class ContentTranslateViewFilterParametersListener implements EventSubscriberInt
             'contentType' => $contentType, /** @deprecated In 2.2, will be removed in 3.0. Use `content_type` instead. */
             'content_type' => $contentType,
             'isPublished' => $contentInfo->isPublished(),  /** @deprecated In 2.2, will be removed in 3.0. Use `ContentInfo::isPublished` in Twig directly. */
+            'is_translate_view' => true,
         ]);
     }
 }

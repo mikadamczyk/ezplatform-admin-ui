@@ -23,3 +23,9 @@ services:
         arguments:
             $siteaccessGroups: '%ezpublish.siteaccess.groups%'
             $systemUrlRedirectProcessor: '@EzSystems\EzPlatformAdminUi\RepositoryForms\Form\Processor\Content\UrlRedirectProcessor.inner'
+
+    EzSystems\EzPlatformAdminUi\RepositoryForms\Form\Processor\ContentFormProcessor:
+        public: true
+        decorates: ezrepoforms.form_processor.content
+        arguments:
+            $contentFormProcessor: '@EzSystems\EzPlatformAdminUi\RepositoryForms\Form\Processor\ContentFormProcessor.inner'

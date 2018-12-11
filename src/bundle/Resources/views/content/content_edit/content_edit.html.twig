@@ -55,12 +55,14 @@
 {% endblock %}
 
 {% block right_sidebar %}
+    {% set is_translate_view = is_translate_view ?? false %}
     {% set content_edit_sidebar_right = knp_menu_get('ezplatform_admin_ui.menu.content_edit.sidebar_right', [], {
         'content': content,
         'content_type': contentType,
         'location': location,
         'parent_location': parentLocation,
-        'language': language
+        'language': language,
+        'is_translate_view': is_translate_view,
     }) %}
     {{ knp_menu_render(content_edit_sidebar_right, {'template': '@ezdesign/parts/menu/sidebar_right.html.twig'}) }}
 {% endblock %}
