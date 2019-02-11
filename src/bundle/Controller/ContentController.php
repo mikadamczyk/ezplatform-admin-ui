@@ -10,9 +10,12 @@ use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\Exceptions as ApiException;
 use eZ\Publish\API\Repository\Exceptions\UnauthorizedException;
 use eZ\Publish\API\Repository\LocationService;
+use eZ\Publish\API\Repository\PermissionResolver;
 use eZ\Publish\API\Repository\UserService;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\Content\VersionInfo;
+use eZ\Publish\API\Repository\Values\User\Limitation\LanguageLimitation;
 use eZ\Publish\Core\Base\Exceptions\BadStateException;
 use EzSystems\EzPlatformAdminUi\Exception\InvalidArgumentException as AdminInvalidArgumentException;
 use EzSystems\EzPlatformAdminUi\Form\Data\Content\Draft\ContentCreateData;
@@ -25,9 +28,11 @@ use EzSystems\EzPlatformAdminUi\Form\Factory\FormFactory;
 use EzSystems\EzPlatformAdminUi\Form\SubmitHandler;
 use EzSystems\EzPlatformAdminUi\Form\Type\Content\Translation\MainTranslationUpdateType;
 use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
+use EzSystems\EzPlatformAdminUi\Permission\PermissionCheckerInterface;
 use EzSystems\EzPlatformAdminUi\Siteaccess\SiteaccessResolverInterface;
 use EzSystems\EzPlatformAdminUi\Specification\ContentIsUser;
 use EzSystems\EzPlatformAdminUi\Specification\ContentType\ContentTypeIsUser;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -69,6 +74,12 @@ class ContentController extends Controller
     /** @var array */
     private $userContentTypeIdentifier;
 
+    /** @var \eZ\Publish\API\Repository\PermissionResolver */
+    private $permissionResolver;
+
+    /** @var \EzSystems\EzPlatformAdminUi\Permission\PermissionCheckerInterface */
+    private $permissionChecker;
+
     /**
      * @param \EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface $notificationHandler
      * @param \eZ\Publish\API\Repository\ContentService $contentService
@@ -79,6 +90,8 @@ class ContentController extends Controller
      * @param \EzSystems\EzPlatformAdminUi\Siteaccess\SiteaccessResolverInterface $siteaccessResolver
      * @param \eZ\Publish\API\Repository\LocationService $locationService
      * @param \eZ\Publish\API\Repository\UserService $userService
+     * @param \eZ\Publish\API\Repository\PermissionResolver $permissionResolver
+     * @param \EzSystems\EzPlatformAdminUi\Permission\PermissionCheckerInterface $permissionChecker
      * @param array $userContentTypeIdentifier
      */
     public function __construct(
@@ -91,6 +104,8 @@ class ContentController extends Controller
         SiteaccessResolverInterface $siteaccessResolver,
         LocationService $locationService,
         UserService $userService,
+        PermissionResolver $permissionResolver,
+        PermissionCheckerInterface $permissionChecker,
         array $userContentTypeIdentifier
     ) {
         $this->notificationHandler = $notificationHandler;
@@ -103,6 +118,8 @@ class ContentController extends Controller
         $this->locationService = $locationService;
         $this->userService = $userService;
         $this->userContentTypeIdentifier = $userContentTypeIdentifier;
+        $this->permissionResolver = $permissionResolver;
+        $this->permissionChecker = $permissionChecker;
     }
 
     /**
@@ -381,4 +398,56 @@ class ContentController extends Controller
 
         return $this->redirectToRoute('ezplatform.dashboard');
     }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
+     * @throws \eZ\Publish\API\Repository\Exceptions\BadStateException
+     */
+    public function checkEditPermissionAction(Content $content): JsonResponse
+    {
+        $canEdit = $this->permissionResolver->canUser('content', 'edit', $content);
+        $editLanguagesLimitationValues = $this->getEditLanguagesLimitationValues($content->versionInfo);
+
+        $response = new JsonResponse();
+        $response->setData([
+            'canEdit' => $canEdit,
+            'editLanguagesLimitationValues' => false === $canEdit ? [] : $editLanguagesLimitationValues,
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * @param \eZ\Publish\API\Repository\Values\Content\VersionInfo $versionInfo
+     *
+     * @return array
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
+     */
+    private function getEditLanguagesLimitationValues(VersionInfo $versionInfo): array
+    {
+        $editLanguages = [];
+        $hasAccess = $this->permissionResolver->hasAccess('content', 'edit');
+
+        if (false === $hasAccess){
+            return $editLanguages;
+        }
+
+        $editLanguages = $versionInfo->languageCodes;
+
+        if (\is_array($hasAccess)){
+            $languageRestrictions = $this->permissionChecker->getRestrictions($hasAccess, LanguageLimitation::class);
+
+            if (!empty($languageRestrictions)){
+                $editLanguages = array_intersect($editLanguages, $languageRestrictions);
+            }
+        }
+
+        return $editLanguages;
+    }
+
 }

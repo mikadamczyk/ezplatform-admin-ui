@@ -12,6 +12,7 @@
         const versionInfoVersionNoInput = versionEditForm.querySelector('input[name="' + versionEditFormName + '[version_info][version_no]"]');
         const languageInput = versionEditForm.querySelector('#'+ versionEditFormName +'_language_' + languageCode);
         const checkVersionDraftLink = global.Routing.generate('ezplatform.version_draft.has_no_conflict', { contentId });
+        const checkEditPermissionLink = global.Routing.generate('ezplatform.content.check_edit_permission', { contentId });
         const submitVersionEditForm = () => {
             contentInfoInput.value = contentId;
             versionInfoContentInfoInput.value = contentId;
@@ -37,19 +38,34 @@
 
         event.preventDefault();
 
-        fetch(checkVersionDraftLink, {
-            credentials: 'same-origin'
-        }).then(function (response) {
-            // Status 409 means that a draft conflict has occurred and the modal must be displayed.
-            // Otherwise we can go to Content Item edit page.
-            if (response.status === 409) {
-                response.text().then(showModal);
-            } else if (response.status === 403) {
-                response.text().then(showErrorNotification);
-            } else if (response.status === 200) {
-                submitVersionEditForm();
-            }
-        });
+        const errorMessage = Translator.trans(
+            /*@Desc("You cannot edit Content with ID: %id%")*/ 'content.edit.permission.error',
+            { id: contentId },
+            'content'
+        );
+
+        fetch(checkEditPermissionLink, {credentials: 'same-origin'})
+            .then(eZ.helpers.request.getJsonFromResponse)
+            .then((data) => {
+                if (data.canEdit) {
+                    console.log('canEdit');
+                    return fetch(checkVersionDraftLink, {credentials: 'same-origin'});
+                } else {
+                    console.log('canNotEdit');
+                    showErrorNotification(errorMessage);
+                }
+            })
+            .then(function (response) {
+                // Status 409 means that a draft conflict has occurred and the modal must be displayed.
+                // Otherwise we can go to Content Item edit page.
+                if (response.status === 409) {
+                    response.text().then(showModal);
+                } else if (response.status === 403) {
+                    response.text().then(showErrorNotification);
+                } else if (response.status === 200) {
+                    submitVersionEditForm();
+                }
+            });
     };
 
     [...doc.querySelectorAll('.ez-btn--content-edit')].forEach(button => button.addEventListener('click', editVersion, false));
