@@ -353,7 +353,7 @@ class ContentController extends Controller
     }
 
     /**
-     * @param Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -415,7 +415,7 @@ class ContentController extends Controller
         $response = new JsonResponse();
         $response->setData([
             'canEdit' => $canEdit,
-            'editLanguagesLimitationValues' => false === $canEdit ? [] : $editLanguagesLimitationValues,
+            'editLanguagesLimitationValues' => $canEdit ? $editLanguagesLimitationValues : [],
         ]);
 
         return $response;

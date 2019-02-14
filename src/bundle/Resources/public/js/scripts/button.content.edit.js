@@ -49,7 +49,7 @@
                 return fetch(checkVersionDraftLink, { mode: 'same-origin', credentials: 'same-origin' });
             }
 
-            showErrorNotification(errorMessage);
+            throw new Error(errorMessage);
         };
         const handleDraftConflict = (response) => {
             // Status 409 means that a draft conflict has occurred and the modal must be displayed.
@@ -68,7 +68,8 @@
         fetch(checkEditPermissionLink, { mode: 'same-origin', credentials: 'same-origin' })
             .then(eZ.helpers.request.getJsonFromResponse)
             .then(handleCanEditCheck)
-            .then(handleDraftConflict);
+            .then(handleDraftConflict)
+            .catch(showErrorNotification);
     };
 
     doc.querySelectorAll('.ez-btn--content-edit').forEach((button) => button.addEventListener('click', editVersion, false));
